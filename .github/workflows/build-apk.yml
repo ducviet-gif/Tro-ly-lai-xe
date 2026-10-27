@@ -6,9 +6,24 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+
+      - name: Sap xep lai thu muc du an
+        run: |
+          if [ ! -d app ]; then
+            mkdir -p app/src/main/java/vn/trolylaixe/app app/src/main/assets/fonts app/src/main/res/values app/src/main/res/drawable
+            mv build.gradle app/build.gradle
+            mv "build (1).gradle" build.gradle
+            mv MainActivity.java app/src/main/java/vn/trolylaixe/app/
+            mv AndroidManifest.xml app/src/main/
+            mv index.html app.js app/src/main/assets/
+            mv *.woff2 app/src/main/assets/fonts/
+            mv strings.xml styles.xml app/src/main/res/values/
+            mv ic_launcher.xml app/src/main/res/drawable/
+          fi
+          find . -path ./.git -prune -o -type f -print
 
       - uses: actions/setup-java@v4
         with:
@@ -23,11 +38,8 @@ jobs:
 
       - name: Build APK
         run: |
-          DIR=$(dirname "$(find . -name settings.gradle -not -path '*/node_modules/*' | head -1)")
-          echo "Thu muc du an: $DIR"
-          cd "$DIR"
           gradle assembleDebug --no-daemon
-          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/TroLyLaiXe.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk TroLyLaiXe.apk
 
       - uses: actions/upload-artifact@v4
         with:
